@@ -22,21 +22,30 @@ namespace Tools.Utils
                 IEnumerable<string> fileList = getFileList();
                 IEnumerable<string> savedLines;            
                 string tempFileName;
-                int origNbLines;                
-                int nbRemovedLines;
+                int origNbLines = 0;                
+                int nbRemovedLines = 0;
                 foreach (var fname in fileList) {
-                    Console.Write($"> cleaning [{Path.GetFileName(fname)}] : ");
-                    tempFileName = Path.GetTempFileName();
-                    origNbLines = File.ReadAllLines(fname).Count();                    
-                    savedLines = File.ReadLines(fname).Where(line => !(_ghostStrings.Contains(line.Trim())));
-                    nbRemovedLines = origNbLines - savedLines.Count();
+                    Console.Write($"> cleaning [{Path.GetFileName(fname)}] : ");                    
+                        try {
+                            origNbLines = File.ReadAllLines(fname).Count();                    
+                            savedLines = File.ReadLines(fname).Where(line => !(_ghostStrings.Contains(line.Trim())));
+                            nbRemovedLines = origNbLines - savedLines.Count();
+                            if (nbRemovedLines > 0) {
+                                tempFileName = Path.GetTempFileName();
+                                File.WriteAllLines(tempFileName, savedLines);
+                                File.Delete(fname);
+                                File.Move(tempFileName, fname);
+                            }
+                            
+                            Console.ForegroundColor = nbRemovedLines > 0 ? ConsoleColor.Green : ConsoleColor.DarkGray;
+                            Console.WriteLine($" OK => {nbRemovedLines}/{origNbLines} lines removed ");
+                            Console.ForegroundColor = ConsoleColor.White;            
 
-                    File.WriteAllLines(tempFileName, savedLines);
-                    File.Delete(fname);
-                    File.Move(tempFileName, fname);                                    
-                    Console.ForegroundColor = nbRemovedLines > 0 ? ConsoleColor.Green : ConsoleColor.DarkGray;
-                    Console.WriteLine($" OK => {nbRemovedLines}/{origNbLines} lines removed ");
-                    Console.ForegroundColor = ConsoleColor.White;            
+                        } catch(Exception e) {
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.WriteLine($" File access Error while updating data: " + e.Message);
+                            Console.ForegroundColor = ConsoleColor.White;            
+                        }
                 }
                 
                 ConsoleUtil.WriteColoredBlock($"End removing ghosts ({fileList.Count()} files processed)", ConsoleColor.Cyan);
