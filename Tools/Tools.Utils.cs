@@ -2,7 +2,7 @@
 //                   Tools.Utils
 // object : Outil de controle sur filtres/fichiers
 ///////////////////////////////////////////////////////////////
-namespace Tools.Utils
+namespace RemoveEmptyProp.Tools
 {
     public class FileCleaner {
 
@@ -49,16 +49,12 @@ namespace Tools.Utils
                 }
                 
                 ConsoleUtil.WriteColoredBlock($"End removing ghosts ({fileList.Count()} files processed)", ConsoleColor.Cyan);
-                Console.WriteLine("(Press Enter)"); 
-                Console.ReadLine();   
 
             } catch(Exception e) {
                 Console.WriteLine("");    
                 Console.ForegroundColor = ConsoleColor.Red;            
                 Console.WriteLine("> @@ Error RemoveGhost(): " + e.Message);
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("(Press Enter)"); 
-                Console.ReadLine();                
                 throw;   
             }
         }
